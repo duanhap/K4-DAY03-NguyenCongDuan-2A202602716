@@ -6,106 +6,146 @@ Mã nguồn chứa danh sách Tool Schemas (JSON Schema) và Execution Layer ph�
 import json
 from typing import Dict, Any
 
-# ==============================================================================
-# 1. KHAI BÁO TOOL SCHEMAS CHUẨN NATIVE JSON SCHEMA (TASK 1.2)
-# ==============================================================================
+# ============================================================================
+# 1. KHAI BÁO TOOL SCHEMAS CHUẨN NATIVE JSON SCHEMA
+# ============================================================================
 
 TOOLS_SCHEMA = [
-    # Tool 1: Đã được định nghĩa mẫu sẵn cho Học viên tham khảo
     {
-        "name": "academic_query",
-        "description": "Tra cứu hồ sơ và thông tin học vụ của sinh viên VinUni bằng mã sinh viên.",
+        "name": "job_requirements_query",
+        "description": "Tra cứu tiêu chí tuyển dụng của một vị trí.",
         "parameters": {
             "type": "object",
             "properties": {
-                "student_id": {
+                "position": {
                     "type": "string",
-                    "description": "Mã sinh viên cần tra cứu (ví dụ: 'SV2026001')"
+                    "description": "Tên vị trí cần tra cứu, ví dụ: 'Kỹ sư Phần mềm Backend'"
                 }
             },
-            "required": ["student_id"]
+            "required": ["position"]
         }
     },
-    
-    # --------------------------------------------------------------------------
-    # TODO 1.2: HỌC VIÊN HOÀN THIỆN TOOL SCHEMA CHO 'schedule_appointment'
-    # 🎯 YÊU CẦU THIẾT KẾ SCHEMA (JSON SCHEMA STANDARD):
-    # 1. Tool dùng để đặt lịch hẹn tư vấn học vụ với Cố vấn học tập VinUni.
-    # 2. Thiết kế các tham số (properties) để LLM trích xuất:
-    #    - student_id (string): Mã sinh viên cần đặt lịch (ví dụ: 'SV2026001')
-    #    - datetime_str (string): Thời gian hẹn (ví dụ: '14:00 15/09/2026')
-    #    - advisor_name (string): Tên cố vấn học tập
-    # 3. Khai báo danh sách các trường bắt buộc (required).
-    # --------------------------------------------------------------------------
     {
-        "name": "schedule_appointment",
-        "description": "Đặt lịch hẹn tư vấn học vụ với Cố vấn học tập VinUni.",
+        "name": "candidate_cv_query",
+        "description": "Tra cứu hồ sơ và nội dung CV của ứng viên.",
         "parameters": {
             "type": "object",
             "properties": {
-                # TODO 1.2: Khai báo các thuộc tính tham số cho Tool tại đây...
+                "candidate_id": {
+                    "type": "string",
+                    "description": "Mã ứng viên, ví dụ: 'UV2026001'"
+                }
             },
-            "required": [] # TODO 1.2: Khai báo danh sách các trường bắt buộc tại đây...
+            "required": ["candidate_id"]
+        }
+    },
+    {
+        "name": "send_interview_notification",
+        "description": "Gửi thông báo mời ứng viên tham dự phỏng vấn.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "candidate_id": {
+                    "type": "string",
+                    "description": "Mã ứng viên nhận thông báo"
+                },
+                "position": {
+                    "type": "string",
+                    "description": "Vị trí tuyển dụng"
+                },
+                "datetime_str": {
+                    "type": "string",
+                    "description": "Thời gian phỏng vấn, ví dụ: '09:00 ngày 20/09/2026'"
+                },
+                "channel": {
+                    "type": "string",
+                    "description": "Kênh gửi thông báo, ví dụ: 'email'"
+                }
+            },
+            "required": ["candidate_id", "position", "datetime_str", "channel"]
         }
     }
 ]
 
-# ==============================================================================
+# ============================================================================
 # 2. MÔ PHỎNG DỮ LIỆU & HÀM THỰC THI TOOL (EXECUTION LAYER)
-# ==============================================================================
+# ============================================================================
 
-MOCK_DATABASE = {
-    "SV2026001": {
+JOB_REQUIREMENTS = {
+    "Kỹ sư Phần mềm Backend": {
+        "level": "Junior/Mid",
+        "skills": ["Python", "REST API", "SQL"],
+        "experience_years": 1,
+        "education": "Công nghệ thông tin hoặc ngành liên quan"
+    }
+}
+
+CANDIDATE_DATABASE = {
+    "UV2026001": {
         "full_name": "Nguyễn Văn An",
-        "class": "AI-K4",
-        "gpa": 3.85,
-        "email": "an.nv@vinuni.edu.vn",
-        "status": "Đang học",
-        "advisor": "PGS.TS Nguyễn Văn A"
-    },
-    "SV2026002": {
-        "full_name": "Trần Thị Bình",
-        "class": "AI-K4",
-        "gpa": 3.60,
-        "email": "binh.tt@vinuni.edu.vn",
-        "status": "Đang học",
-        "advisor": "TS. Lê Thị B"
+        "email": "an.nguyen@example.com",
+        "skills": ["Python", "REST API", "SQL"],
+        "experience_years": 2,
+        "education": "Công nghệ thông tin"
     }
 }
 
 
-def execute_academic_query(student_id: str) -> str:
-    """Thực thi tra cứu học vụ theo mã sinh viên"""
-    student = MOCK_DATABASE.get(student_id.strip().upper())
-    if student:
+def execute_job_requirements_query(position: str) -> str:
+    """Tra cứu tiêu chí tuyển dụng theo vị trí."""
+    requirements = JOB_REQUIREMENTS.get(position.strip())
+    if requirements:
         return json.dumps({
             "status": "SUCCESS",
-            "student_id": student_id,
-            "data": student
+            "position": position,
+            "data": requirements
         }, ensure_ascii=False)
-    else:
+    return json.dumps({
+        "status": "NOT_FOUND",
+        "message": f"Chưa có tiêu chí tuyển dụng cho vị trí '{position}'."
+    }, ensure_ascii=False)
+
+
+def execute_candidate_cv_query(candidate_id: str) -> str:
+    """Tra cứu hồ sơ và CV của ứng viên."""
+    candidate = CANDIDATE_DATABASE.get(candidate_id.strip().upper())
+    if candidate:
+        return json.dumps({
+            "status": "SUCCESS",
+            "candidate_id": candidate_id,
+            "data": candidate
+        }, ensure_ascii=False)
+    return json.dumps({
+        "status": "NOT_FOUND",
+        "message": f"Không tìm thấy hồ sơ ứng viên có mã '{candidate_id}'."
+    }, ensure_ascii=False)
+
+
+def execute_send_interview_notification(candidate_id: str, position: str, datetime_str: str, channel: str) -> str:
+    """Gửi thông báo mời phỏng vấn cho ứng viên."""
+    candidate = CANDIDATE_DATABASE.get(candidate_id.strip().upper())
+    if not candidate:
         return json.dumps({
             "status": "NOT_FOUND",
-            "message": f"Không tìm thấy dữ liệu sinh viên có mã '{student_id}'"
+            "message": f"Không thể gửi thông báo vì không tìm thấy ứng viên '{candidate_id}'."
         }, ensure_ascii=False)
-
-
-def execute_schedule_appointment(student_id: str, datetime_str: str, advisor_name: str = "PGS.TS Nguyễn Văn A") -> str:
-    """Thực thi đặt lịch hẹn tư vấn học vụ"""
     return json.dumps({
         "status": "SUCCESS",
-        "booking_id": f"BK-{student_id}-99",
-        "student_id": student_id,
+        "notification_id": f"NT-{candidate_id}-99",
+        "candidate_id": candidate_id,
+        "recipient": candidate["email"],
+        "position": position,
         "datetime": datetime_str,
-        "advisor": advisor_name,
-        "message": f"Đặt lịch thành công cho sinh viên {student_id} với {advisor_name} vào lúc {datetime_str}."
+        "channel": channel,
+        "message": f"Đã gửi thông báo mời phỏng vấn vị trí {position} cho {candidate['full_name']} vào {datetime_str} qua {channel}."
     }, ensure_ascii=False)
 
 
 # Router gọi tool thực tế
 TOOL_ROUTER = {
-    "academic_query": execute_academic_query,
-    "schedule_appointment": execute_schedule_appointment
+    "job_requirements_query": execute_job_requirements_query,
+    "candidate_cv_query": execute_candidate_cv_query,
+    "send_interview_notification": execute_send_interview_notification
 }
 
 def dispatch_tool_call(tool_name: str, arguments: Dict[str, Any]) -> str:

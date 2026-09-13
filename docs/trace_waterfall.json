@@ -1,29 +1,175 @@
 [
   {
     "step": 1,
-    "query": "Chào bạn, bạn có thể giới thiệu quy chế học vụ cơ bản của Đại học VinUni không?",
+    "query": "Chào bạn, hãy giới thiệu ngắn gọn quy trình tuyển dụng và sàng lọc CV.",
     "action_type": "FINAL_ANSWER",
-    "thought": "Câu hỏi chung về quy chế học vụ, trả lời trực tiếp không cần gọi Tool.",
-    "output": "[Mock Agent Response]: Xin chào! Quy chế học vụ VinUni yêu cầu sinh viên tích lũy tối thiểu 120 tín chỉ và duy trì GPA trên 2.0 để tốt nghiệp.",
-    "latency_ms": 2845.93
+    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+    "output": "Chào bạn! Quy trình tuyển dụng và sàng lọc CV chuẩn thường bao gồm các bước chính sau đây:\n\n1. **Xác định nhu cầu và lập mô tả công việc (JD):** Xác định rõ vị trí cần tuyển, số lượng, các yêu cầu về kỹ năng, kinh nghiệm và chuyên môn.\n2. **Đăng tuyển và tiếp nhận hồ sơ:** Đăng tải thông tin tuyển dụng trên các kênh (website công ty, mạng xã hội việc làm, v.v.) và thu thập CV từ ứng viên.\n3. **Sàng lọc CV (Resume Screening):** Đối chiếu các thông tin trong CV của ứng viên (học vấn, kinh nghiệm, kỹ năng) với tiêu chí tuyển dụng của vị trí để chọn ra những hồ sơ phù hợp nhất.\n4. **Phỏng vấn sơ loại (Phone Screening):** Trao đổi ngắn qua điện thoại hoặc trực tuyến với ứng viên để xác nhận lại thông tin cơ bản, mức lương kỳ vọng và độ phù hợp về văn hóa.\n5. **Phỏng vấn chuyên môn và kỹ năng:** Các vòng phỏng vấn sâu với quản lý trực tiếp hoặc hội đồng tuyển dụng (có thể kết hợp bài kiểm tra năng lực).\n6. **Đàm phán offer và Tuyển dụng:** Gửi thư mời nhận việc (Offer Letter) cho ứng viên xuất sắc nhất và tiến hành thủ tục gia nhập công ty.\n\nNếu bạn cần sàng lọc CV cho một vị trí cụ thể nào đó, hãy cho tôi biết nhé!",
+    "latency_ms": 2739.75
   },
   {
     "step": 1,
-    "query": "Hãy tra cứu thông tin học vụ của sinh viên SV2026001.",
+    "query": "Hãy tra cứu tiêu chí tuyển dụng của vị trí Kỹ sư Phần mềm Backend.",
     "action_type": "TOOL_EXECUTION",
-    "tool_name": "academic_query",
+    "tool_name": "job_requirements_query",
     "arguments": {
-      "student_id": "SV2026001"
+      "position": "Kỹ sư Phần mềm Backend"
     },
-    "observation": {},
-    "latency_ms": 799.12
+    "observation": {
+      "status": "SUCCESS",
+      "position": "Kỹ sư Phần mềm Backend",
+      "data": {
+        "level": "Junior/Mid",
+        "skills": [
+          "Python",
+          "REST API",
+          "SQL"
+        ],
+        "experience_years": 1,
+        "education": "Công nghệ thông tin hoặc ngành liên quan"
+      }
+    },
+    "latency_ms": 1255.4
   },
   {
     "step": 2,
-    "query": "Hãy tra cứu thông tin học vụ của sinh viên SV2026001.",
+    "query": "Hãy tra cứu tiêu chí tuyển dụng của vị trí Kỹ sư Phần mềm Backend.",
     "action_type": "FINAL_ANSWER",
-    "thought": "Tổng hợp kết quả từ MCP Server thành công.",
-    "output": "Chưa thể trả lời chi tiết do chưa nhận được dữ liệu từ MCP Server (hãy hoàn thành TODO 2.1).",
-    "latency_ms": 10.0
+    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+    "output": "Dựa trên kết quả tra cứu, tiêu chí tuyển dụng cho vị trí **Kỹ sư Phần mềm Backend** cụ thể như sau:\n\n* **Cấp bậc (Level):** Junior/Mid\n* **Kỹ năng yêu cầu (Skills):** Python, REST API, SQL\n* **Kinh nghiệm (Experience):** Tối thiểu 1 năm (1 năm)\n* **Học vấn (Education):** Tốt nghiệp ngành Công nghệ thông tin hoặc các ngành liên quan.",
+    "latency_ms": 1287.92
+  },
+  {
+    "step": 1,
+    "query": "Hãy gửi thông báo mời phỏng vấn cho ứng viên UV2026001 vào lúc 09:00 ngày 20/09/2026 cho vị trí Kỹ sư Phần mềm Backend qua email.",
+    "action_type": "TOOL_EXECUTION",
+    "tool_name": "send_interview_notification",
+    "arguments": {
+      "candidate_id": "UV2026001",
+      "channel": "email",
+      "datetime_str": "09:00 ngày 20/09/2026",
+      "position": "Kỹ sư Phần mềm Backend"
+    },
+    "observation": {
+      "status": "SUCCESS",
+      "notification_id": "NT-UV2026001-99",
+      "candidate_id": "UV2026001",
+      "recipient": "an.nguyen@example.com",
+      "position": "Kỹ sư Phần mềm Backend",
+      "datetime": "09:00 ngày 20/09/2026",
+      "channel": "email",
+      "message": "Đã gửi thông báo mời phỏng vấn vị trí Kỹ sư Phần mềm Backend cho Nguyễn Văn An vào 09:00 ngày 20/09/2026 qua email."
+    },
+    "latency_ms": 1249.74
+  },
+  {
+    "step": 2,
+    "query": "Hãy gửi thông báo mời phỏng vấn cho ứng viên UV2026001 vào lúc 09:00 ngày 20/09/2026 cho vị trí Kỹ sư Phần mềm Backend qua email.",
+    "action_type": "FINAL_ANSWER",
+    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+    "output": "Thông báo mời phỏng vấn đã được gửi thành công đến ứng viên!\n\n**Chi tiết thông báo:**\n- **Mã ứng viên:** UV2026001 (Nguyễn Văn An)\n- **Email nhận:** an.nguyen@example.com\n- **Vị trí:** Kỹ sư Phần mềm Backend\n- **Thời gian:** 09:00 ngày 20/09/2026\n- **Kênh:** Email\n- **Mã thông báo:** NT-UV2026001-99",
+    "latency_ms": 1359.69
+  },
+  {
+    "step": 1,
+    "query": "Hãy tra cứu tiêu chí tuyển dụng vị trí Kỹ sư Phần mềm Backend, kiểm tra mức độ phù hợp của CV ứng viên UV2026001, rồi nếu đạt yêu cầu hãy gửi thông báo mời phỏng vấn vào lúc 14:00 ngày 22/09/2026 qua email.",
+    "action_type": "TOOL_EXECUTION",
+    "tool_name": "job_requirements_query",
+    "arguments": {
+      "position": "Kỹ sư Phần mềm Backend"
+    },
+    "observation": {
+      "status": "SUCCESS",
+      "position": "Kỹ sư Phần mềm Backend",
+      "data": {
+        "level": "Junior/Mid",
+        "skills": [
+          "Python",
+          "REST API",
+          "SQL"
+        ],
+        "experience_years": 1,
+        "education": "Công nghệ thông tin hoặc ngành liên quan"
+      }
+    },
+    "latency_ms": 1201.02
+  },
+  {
+    "step": 2,
+    "query": "Hãy tra cứu tiêu chí tuyển dụng vị trí Kỹ sư Phần mềm Backend, kiểm tra mức độ phù hợp của CV ứng viên UV2026001, rồi nếu đạt yêu cầu hãy gửi thông báo mời phỏng vấn vào lúc 14:00 ngày 22/09/2026 qua email.",
+    "action_type": "TOOL_EXECUTION",
+    "tool_name": "candidate_cv_query",
+    "arguments": {
+      "candidate_id": "UV2026001"
+    },
+    "observation": {
+      "status": "SUCCESS",
+      "candidate_id": "UV2026001",
+      "data": {
+        "full_name": "Nguyễn Văn An",
+        "email": "an.nguyen@example.com",
+        "skills": [
+          "Python",
+          "REST API",
+          "SQL"
+        ],
+        "experience_years": 2,
+        "education": "Công nghệ thông tin"
+      }
+    },
+    "latency_ms": 966.08
+  },
+  {
+    "step": 3,
+    "query": "Hãy tra cứu tiêu chí tuyển dụng vị trí Kỹ sư Phần mềm Backend, kiểm tra mức độ phù hợp của CV ứng viên UV2026001, rồi nếu đạt yêu cầu hãy gửi thông báo mời phỏng vấn vào lúc 14:00 ngày 22/09/2026 qua email.",
+    "action_type": "TOOL_EXECUTION",
+    "tool_name": "send_interview_notification",
+    "arguments": {
+      "position": "Kỹ sư Phần mềm Backend",
+      "datetime_str": "14:00 ngày 22/09/2026",
+      "channel": "email",
+      "candidate_id": "UV2026001"
+    },
+    "observation": {
+      "status": "SUCCESS",
+      "notification_id": "NT-UV2026001-99",
+      "candidate_id": "UV2026001",
+      "recipient": "an.nguyen@example.com",
+      "position": "Kỹ sư Phần mềm Backend",
+      "datetime": "14:00 ngày 22/09/2026",
+      "channel": "email",
+      "message": "Đã gửi thông báo mời phỏng vấn vị trí Kỹ sư Phần mềm Backend cho Nguyễn Văn An vào 14:00 ngày 22/09/2026 qua email."
+    },
+    "latency_ms": 1165.44
+  },
+  {
+    "step": 4,
+    "query": "Hãy tra cứu tiêu chí tuyển dụng vị trí Kỹ sư Phần mềm Backend, kiểm tra mức độ phù hợp của CV ứng viên UV2026001, rồi nếu đạt yêu cầu hãy gửi thông báo mời phỏng vấn vào lúc 14:00 ngày 22/09/2026 qua email.",
+    "action_type": "FINAL_ANSWER",
+    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+    "output": "Dựa trên các bước đã thực hiện, tôi xin tổng hợp kết quả như sau:\n\n1. **Tiêu chí tuyển dụng vị trí Kỹ sư Phần mềm Backend:**\n   - **Trình độ:** Junior/Mid\n   - **Kỹ năng yêu cầu:** Python, REST API, SQL\n   - **Kinh nghiệm:** Từ 1 năm trở lên\n   - **Học vấn:** Tốt nghiệp ngành Công nghệ thông tin hoặc ngành liên quan.\n\n2. **Đánh giá hồ sơ ứng viên (UV2026001 - Nguyễn Văn An):**\n   - **Kỹ năng:** Có đủ các kỹ năng yêu cầu (Python, REST API, SQL).\n   - **Kinh nghiệm:** 2 năm (đạt yêu cầu tối thiểu 1 năm).\n   - **Học vấn:** Công nghệ thông tin (đạt yêu cầu).\n   - **Kết luận:** Ứng viên hoàn toàn đạt yêu cầu và phù hợp với tiêu chí tuyển dụng.\n\n3. **Thông báo phỏng vấn:**\n   - Hệ thống đã gửi thông báo mời phỏng vấn thành công cho ứng viên Nguyễn Văn An qua email vào lúc **14:00 ngày 22/09/2026** cho vị trí **Kỹ sư Phần mềm Backend** (Mã thông báo: `NT-UV2026001-99`).",
+    "latency_ms": 1684.18
+  },
+  {
+    "step": 1,
+    "query": "Hãy tra cứu hồ sơ và CV của ứng viên UV9999999 cho vị trí Kỹ sư Phần mềm Backend để đánh giá sơ bộ và gửi thông báo phỏng vấn nếu phù hợp.",
+    "action_type": "TOOL_EXECUTION",
+    "tool_name": "candidate_cv_query",
+    "arguments": {
+      "candidate_id": "UV9999999"
+    },
+    "observation": {
+      "status": "NOT_FOUND",
+      "message": "Không tìm thấy hồ sơ ứng viên có mã 'UV9999999'."
+    },
+    "latency_ms": 1018.89
+  },
+  {
+    "step": 2,
+    "query": "Hãy tra cứu hồ sơ và CV của ứng viên UV9999999 cho vị trí Kỹ sư Phần mềm Backend để đánh giá sơ bộ và gửi thông báo phỏng vấn nếu phù hợp.",
+    "action_type": "FINAL_ANSWER",
+    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ).",
+    "output": "Không tìm thấy hồ sơ của ứng viên với mã **UV9999999** trong hệ thống. Do đó, tôi không thể tiến hành tra cứu CV, đánh giá sơ bộ hay gửi thông báo phỏng vấn cho ứng viên này. Vui lòng kiểm tra lại mã số ứng viên.",
+    "latency_ms": 1192.53
   }
 ]

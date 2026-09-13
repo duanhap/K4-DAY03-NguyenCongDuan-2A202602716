@@ -36,27 +36,94 @@ class MockOfflineProvider(BaseLLMProvider):
 
     def generate_with_tools(self, prompt: str, tools_schema: List[Dict[str, Any]], system_prompt: str = "") -> Dict[str, Any]:
         prompt_lower = prompt.lower()
+        latest_observation = prompt_lower.rsplit("observation from tool '", 1)[-1]
         
-        # Mô phỏng nhận diện intent gọi Tool
-        if "sv2026001" in prompt_lower and "đặt lịch" in prompt_lower:
+        # Mô phỏng quyết định của LLM sau khi nhận Observation từ tool.
+        if latest_observation.startswith("send_interview_notification'"):
             return {
-                "type": "tool_call",
-                "tool_name": "schedule_appointment",
-                "arguments": {"student_id": "SV2026001", "datetime_str": "14:00 15/09/2026", "advisor_name": "PGS.TS Nguyễn Văn A"},
-                "thought": "Người dùng yêu cầu đặt lịch hẹn tư vấn cho sinh viên SV2026001. Tôi sẽ gọi tool schedule_appointment."
+                "type": "text",
+                "content": "Đã sàng lọc CV đạt yêu cầu và gửi thành công thông báo mời phỏng vấn cho ứng viên.",
+                "thought": "Đã hoàn tất quy trình tuyển dụng."
             }
-        elif "sv2026001" in prompt_lower or "tra cứu" in prompt_lower:
+        if latest_observation.startswith("candidate_cv_query'"):
+            if '"status": "not_found"' in latest_observation:
+                return {
+                    "type": "text",
+                    "content": "Không tìm thấy hồ sơ ứng viên yêu cầu nên chưa thể đánh giá hoặc gửi thông báo.",
+                    "thought": "Ứng viên không tồn tại, không thực hiện thêm hành động."
+                }
+            if "gửi" in prompt_lower or "thông báo" in prompt_lower:
+                return {
+                    "type": "tool_call",
+                    "tool_name": "send_interview_notification",
+                    "arguments": {
+                        "candidate_id": "UV2026001",
+                        "position": "Kỹ sư Phần mềm Backend",
+                        "datetime_str": "14:00 ngày 22/09/2026" if "14:00" in prompt_lower else "09:00 ngày 20/09/2026",
+                        "channel": "email"
+                    },
+                    "thought": "CV đáp ứng tiêu chí tuyển dụng. Tôi sẽ gửi thông báo mời phỏng vấn."
+                }
+            return {
+                "type": "text",
+                "content": "CV ứng viên phù hợp với các tiêu chí đã tra cứu.",
+                "thought": "Observation đã đủ để trả lời yêu cầu của người dùng."
+            }
+        if latest_observation.startswith("job_requirements_query'"):
+            if "cv" in prompt_lower:
+                return {
+                    "type": "tool_call",
+                    "tool_name": "candidate_cv_query",
+                    "arguments": {"candidate_id": "UV2026001"},
+                    "thought": "Tiêu chí vị trí đã được tra cứu. Tôi sẽ kiểm tra CV của ứng viên UV2026001."
+                }
+            return {
+                "type": "text",
+                "content": "Đã tra cứu tiêu chí tuyển dụng: cấp độ Junior/Mid, yêu cầu Python, REST API, SQL và tối thiểu 1 năm kinh nghiệm.",
+                "thought": "Observation đã đủ để trả lời yêu cầu của người dùng."
+            }
+        if "tra cứu tiêu chí tuyển dụng" in prompt_lower:
             return {
                 "type": "tool_call",
-                "tool_name": "academic_query",
-                "arguments": {"student_id": "SV2026001"},
-                "thought": "Người dùng muốn tra cứu thông tin học vụ của sinh viên SV2026001. Tôi sẽ gọi tool academic_query."
+                "tool_name": "job_requirements_query",
+                "arguments": {"position": "Kỹ sư Phần mềm Backend"},
+                "continue_after_tool": True,
+                "thought": "Tôi sẽ tra cứu tiêu chí tuyển dụng của vị trí Kỹ sư Phần mềm Backend trước."
+            }
+        if "tra cứu hồ sơ" in prompt_lower or "tra cứu cv" in prompt_lower:
+            candidate_id = "UV9999999" if "uv9999999" in prompt_lower else "UV2026001"
+            return {
+                "type": "tool_call",
+                "tool_name": "candidate_cv_query",
+                "arguments": {"candidate_id": candidate_id},
+                "thought": f"Tôi sẽ tra cứu CV của ứng viên {candidate_id} bằng tool candidate_cv_query."
+            }
+        if "gửi thông báo" in prompt_lower or "mời phỏng vấn" in prompt_lower:
+            candidate_id = "UV2026001" if "uv2026001" in prompt_lower or "nguyễn văn an" in prompt_lower else "UV9999999"
+            datetime_str = "09:00 ngày 20/09/2026" if "09:00" in prompt_lower else "14:00 ngày 22/09/2026"
+            return {
+                "type": "tool_call",
+                "tool_name": "send_interview_notification",
+                "arguments": {
+                    "candidate_id": candidate_id,
+                    "position": "Kỹ sư Phần mềm Backend",
+                    "datetime_str": datetime_str,
+                    "channel": "email"
+                },
+                "thought": "Ứng viên đủ điều kiện nhận thông báo mời phỏng vấn. Tôi sẽ gọi tool send_interview_notification."
+            }
+        if "tiêu chí tuyển dụng" in prompt_lower or "vị trí" in prompt_lower:
+            return {
+                "type": "tool_call",
+                "tool_name": "job_requirements_query",
+                "arguments": {"position": "Kỹ sư Phần mềm Backend"},
+                "thought": "Tôi sẽ tra cứu tiêu chí tuyển dụng của vị trí Kỹ sư Phần mềm Backend."
             }
         else:
             return {
                 "type": "text",
-                "content": f"[Mock Agent Response]: Xin chào! Quy chế học vụ VinUni yêu cầu sinh viên tích lũy tối thiểu 120 tín chỉ và duy trì GPA trên 2.0 để tốt nghiệp.",
-                "thought": "Câu hỏi chung về quy chế học vụ, trả lời trực tiếp không cần gọi Tool."
+                "content": "[Mock Agent Response]: Quy trình tuyển dụng gồm xác định tiêu chí vị trí, sàng lọc CV theo tiêu chí, phỏng vấn ứng viên phù hợp và gửi thông báo lịch phỏng vấn.",
+                "thought": "Câu hỏi chung về tuyển dụng, trả lời trực tiếp không cần gọi Tool."
             }
 
 
@@ -113,9 +180,10 @@ class GeminiProvider(BaseLLMProvider):
                 config=config
             )
 
-            # Kiểm tra xem Gemini có trả về Tool Call không
-            if response.function_calls:
-                call = response.function_calls[0]
+            # Kiểm tra xem Gemini có trả về Tool Call không.
+            function_calls = getattr(response, "function_calls", None) or []
+            if function_calls:
+                call = function_calls[0]
                 args = dict(call.args) if hasattr(call, 'args') and call.args else {}
                 return {
                     "type": "tool_call",
@@ -123,12 +191,22 @@ class GeminiProvider(BaseLLMProvider):
                     "arguments": args,
                     "thought": f"Gemini quyết định gọi công cụ '{call.name}' với tham số: {json.dumps(args, ensure_ascii=False)}"
                 }
-            else:
-                return {
-                    "type": "text",
-                    "content": response.text or "",
-                    "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ)."
-                }
+            response_text = getattr(response, "text", None)
+            if not response_text:
+                text_parts = []
+                for candidate in getattr(response, "candidates", None) or []:
+                    content = getattr(candidate, "content", None)
+                    for part in getattr(content, "parts", None) or []:
+                        part_text = getattr(part, "text", None)
+                        if part_text:
+                            text_parts.append(part_text)
+                response_text = "\n".join(text_parts)
+
+            return {
+                "type": "text",
+                "content": response_text or "Gemini không trả về nội dung văn bản.",
+                "thought": "Gemini phản hồi trực tiếp bằng văn bản (không cần gọi công cụ)."
+            }
 
         except Exception as e:
             print(f"⚠️ [Gemini API Warning]: Không thể kết nối live API ({str(e)}). Tự động fallback về Mock.")

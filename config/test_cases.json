@@ -1,0 +1,37 @@
+[
+  {
+    "id": "TC01",
+    "type": "direct_query",
+    "question": "Chào bạn, hãy giới thiệu ngắn gọn quy trình tuyển dụng và sàng lọc CV.",
+    "expected_behavior": "Agent trả lời trực tiếp từ kiến thức chung, không cần gọi Tool.",
+    "complexity": "Low"
+  },
+  {
+    "id": "TC02",
+    "type": "single_tool_query",
+    "question": "Hãy tra cứu tiêu chí tuyển dụng của vị trí Kỹ sư Phần mềm Backend.",
+    "expected_behavior": "Agent tự động gọi Tool 'job_requirements_query' với vị trí Kỹ sư Phần mềm Backend.",
+    "complexity": "Medium"
+  },
+  {
+    "id": "TC03",
+    "type": "appointment_booking",
+    "question": "Hãy gửi thông báo mời phỏng vấn cho ứng viên UV2026001 vào lúc 09:00 ngày 20/09/2026 cho vị trí Kỹ sư Phần mềm Backend qua email.",
+    "expected_behavior": "Agent tự động gọi Tool 'send_interview_notification' với đúng mã ứng viên, vị trí, thời gian và kênh gửi.",
+    "complexity": "Medium"
+  },
+  {
+    "id": "TC04",
+    "type": "multi_step_reasoning",
+    "question": "Hãy tra cứu tiêu chí tuyển dụng vị trí Kỹ sư Phần mềm Backend, kiểm tra mức độ phù hợp của CV ứng viên UV2026001, rồi nếu đạt yêu cầu hãy gửi thông báo mời phỏng vấn vào lúc 14:00 ngày 22/09/2026 qua email.",
+    "expected_behavior": "Agent thực hiện chuỗi ReAct: gọi 'job_requirements_query', gọi 'candidate_cv_query', đánh giá kết quả rồi gọi 'send_interview_notification' nếu ứng viên phù hợp.",
+    "complexity": "High"
+  },
+  {
+    "id": "TC05",
+    "type": "edge_case_handling",
+    "question": "Hãy tra cứu hồ sơ và CV của ứng viên UV9999999 cho vị trí Kỹ sư Phần mềm Backend để đánh giá sơ bộ và gửi thông báo phỏng vấn nếu phù hợp.",
+    "expected_behavior": "Agent gọi 'candidate_cv_query', nhận kết quả NOT_FOUND và không gửi thông báo hay bịa đặt dữ liệu ứng viên.",
+    "complexity": "Medium"
+  }
+]
